@@ -1,0 +1,45 @@
+{
+  "name": "issue-metadata",
+  "version": "0.1.0",
+  "description": "A NodeJS module to store metadata on GitHub Issues and Pull Requests.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "format": "prettier --write '**/*.ts'",
+    "format-check": "prettier --check '**/*.ts'",
+    "lint": "eslint src/**/*.ts",
+    "test": "vitest run --coverage",
+    "update-snapshots": "vitest run --update",
+    "all": "yarn run build && yarn run format && yarn run lint && yarn test"
+  },
+  "packageManager": "yarn@3.5.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jamacku/issue-metadata.git"
+  },
+  "keywords": [
+    "github"
+  ],
+  "author": "Jan Macku <jamacku@redhat.com>",
+  "license": "GPLv3",
+  "bugs": {
+    "url": "https://github.com/jamacku/issue-metadata/issues"
+  },
+  "homepage": "https://github.com/jamacku/issue-metadata#readme",
+  "devDependencies": {
+    "@types/node": "18.15.0",
+    "@typescript-eslint/eslint-plugin": "5.54.1",
+    "@typescript-eslint/parser": "5.54.1",
+    "@vitest/coverage-c8": "^0.29.7",
+    "eslint": "8.36.0",
+    "prettier": "2.8.4",
+    "typescript": "4.9.5",
+    "vitest": "^0.29.7"
+  },
+  "dependencies": {
+    "@octokit/request": "^6.2.3",
+    "zod": "^3.21.4"
+  }
+}
