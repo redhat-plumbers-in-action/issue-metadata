@@ -16,6 +16,9 @@ export const requestDetailsSchema = z.object(
   {
     owner: z.string().min(1),
     repo: z.string().min(1),
+    headers: z.object({
+      authorization: z.string().min(1),
+    }),
   },
   {
     required_error: `Required settings wasn't provided: {owner: string, repo: string}`,
