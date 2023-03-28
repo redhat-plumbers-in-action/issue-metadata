@@ -16,3 +16,41 @@
 
 [codecov]: https://app.codecov.io/gh/redhat-plumbers-in-action/issue-metadata
 [codecov-status]: https://codecov.io/gh/redhat-plumbers-in-action/issue-metadata/branch/main/graph/badge.svg?token=6wUQKlQeYt
+
+## How to use
+
+### Creating the Metadata controller instance
+
+```typescript
+import MetadataController from "issue-metadata";
+
+const controller = new MetadataController('my_metadata_ID', {
+  owner: 'my_name',
+  repo: 'my_repo',
+  headers: {
+    authorization: `my_GITHUB_API_TOKEN`,
+  },
+});
+```
+
+### Store metadata on issue
+
+```typescript
+await controller.setMetadata(1, 'foo', 'bar');
+// In body of issue #1:
+// <!-- my_metadata_ID = {"foo":"bar"} -->
+
+await controller.setMetadata(1, { foo: 'bar' });
+// In body of issue #1:
+// <!-- my_metadata_ID = {"foo":"bar"} -->
+```
+
+### Get metadata stored on issue
+
+```typescript
+let metadata = await controller.getMetadata(1, 'foo');
+// metadata === "bar"
+
+metadata = await controller.getMetadata(1);
+// metadata === {foo: "bar"}
+```
