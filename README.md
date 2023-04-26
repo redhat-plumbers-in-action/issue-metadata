@@ -28,7 +28,7 @@ const controller = new MetadataController('my_metadata_ID', {
   owner: 'my_name',
   repo: 'my_repo',
   headers: {
-    authorization: `my_GITHUB_API_TOKEN`,
+    authorization: `Bearer my_GITHUB_API_TOKEN`,
   },
 });
 ```
