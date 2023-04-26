@@ -17,13 +17,14 @@ export default class MetadataController {
     this.schema = {
       id: verifiedID,
       template: {
-        before: '\n\n<!-- ',
-        after: ' -->',
+        before: '^<!-- ',
+        after: ' -->$',
       },
     };
 
     this.regexp = new RegExp(
-      `${this.schema.template.before}${verifiedID} = (.*)${this.schema.template.after}`
+      `${this.schema.template.before}${verifiedID} = (.*)${this.schema.template.after}`,
+      'm'
     );
   }
 
