@@ -17,13 +17,13 @@ export default class MetadataController {
     this.schema = {
       id: verifiedID,
       template: {
-        before: '^<!-- ',
-        after: ' -->$',
+        before: '<!-- ',
+        after: ' -->',
       },
     };
 
     this.regexp = new RegExp(
-      `${this.schema.template.before}${verifiedID} = (.*)${this.schema.template.after}`,
+      `^${this.schema.template.before}${verifiedID} = (.*)${this.schema.template.after}$`,
       'm'
     );
   }
@@ -122,7 +122,7 @@ export default class MetadataController {
     await request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       ...this.requestDefaults,
       issue_number: issue,
-      body: `${body}${this.schema.template.before}${
+      body: `${body}\n\n${this.schema.template.before}${
         this.schema.id
       } = ${JSON.stringify(data)}${this.schema.template.after}`,
       ...requestMock.patch,
