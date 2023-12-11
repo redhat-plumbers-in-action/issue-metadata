@@ -40,7 +40,7 @@
     "vitest": "^0.34.6"
   },
   "dependencies": {
-    "@octokit/request": "^6.2.3",
+    "@octokit/request": "^8.0.0",
     "zod": "^3.22.4"
   }
 }
