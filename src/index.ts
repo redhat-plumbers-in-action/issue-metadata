@@ -35,22 +35,17 @@ export default class MetadataController {
   ): Promise<Record<string, string> | undefined>;
   async getMetadata(
     issue: number,
-    key: string,
-    mock: unknown
+    key: string
   ): Promise<Record<string, string> | undefined>;
   async getMetadata(
     issue: number,
-    key?: string,
-    mock?: unknown
+    key?: string
   ): Promise<Record<string, string> | undefined> {
-    const requestMock = mock ? { request: { fetch: mock } } : {};
-
     const body =
       (
         await request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
           ...this.requestDefaults,
           issue_number: issue,
-          ...requestMock,
         })
       ).data.body || '';
 
@@ -79,28 +74,18 @@ export default class MetadataController {
   async setMetadata(
     issue: number,
     key: string,
-    value: string,
-    mock?: { get: unknown; patch: unknown }
+    value: string
   ): Promise<Record<string, string> | never>;
   async setMetadata(
     issue: number,
     key: string | object,
-    value?: string,
-    mock?: { get: unknown; patch: unknown }
+    value?: string
   ): Promise<Record<string, string> | never> {
-    const requestMock = mock
-      ? {
-          get: { request: { fetch: mock.get } },
-          patch: { request: { fetch: mock.patch } },
-        }
-      : {};
-
     let body =
       (
         await request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
           ...this.requestDefaults,
           issue_number: issue,
-          ...requestMock.get,
         })
       ).data.body || '';
 
@@ -125,7 +110,6 @@ export default class MetadataController {
       body: `${body}\n\n${this.schema.template.before}${
         this.schema.id
       } = ${JSON.stringify(data)}${this.schema.template.after}`,
-      ...requestMock.patch,
     });
 
     return data;
