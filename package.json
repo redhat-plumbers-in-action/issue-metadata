@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/redhat-plumbers-in-action/issue-metadata#readme",
   "dependencies": {
-    "@octokit/request": "^8.0.0",
+    "@octokit/request": "^9.0.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
