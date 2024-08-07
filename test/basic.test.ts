@@ -34,21 +34,21 @@ describe('Integration tests ', () => {
       .mockResolvedValueOnce({
         status: 200,
         data: {
-          body: "I'm having a problem with this. Please HELP!!! :sos: ",
+          body: `I'm having a problem with this. Please HELP!!! :sos: \n\n<!-- metadata_id = {"bar":["foo","baz"]} -->`,
         },
       })
       // PATCH /repos/{owner}/{repo}/issues/{issue_number}
       .mockResolvedValueOnce({
         status: 200,
         data: {
-          body: `I'm having a problem with this. Please HELP!!! :sos: \n\n<!-- metadata_id = {"foo":"bar"} -->`,
+          body: `I'm having a problem with this. Please HELP!!! :sos: \n\n<!-- metadata_id = {"bar":["foo","baz"],"foo":["a","b"]} -->`,
         },
       })
       // GET /repos/{owner}/{repo}/issues/{issue_number}
       .mockResolvedValueOnce({
         status: 200,
         data: {
-          body: `I'm having a problem with this. Please HELP!!! :sos: \n\n<!-- metadata_id = {"foo":"bar"} -->`,
+          body: `I'm having a problem with this. Please HELP!!! :sos: \n\n<!-- metadata_id = {"foo":["a","b"]} -->`,
         },
       });
   });
@@ -60,14 +60,23 @@ describe('Integration tests ', () => {
   test('Set and Get Metadata using Controller', async () => {
     expect(metadata).toBeInstanceOf(MetadataController);
 
-    expect(await metadata.setMetadata(issueNumber, 'foo', 'bar'))
+    expect(await metadata.setMetadata(issueNumber, 'foo', `['a', 'b']`))
       .toMatchInlineSnapshot(`
       {
-        "foo": "bar",
+        "bar": [
+          "foo",
+          "baz",
+        ],
+        "foo": "['a', 'b']",
       }
     `);
 
     const data = metadata.getMetadata(issueNumber, 'foo');
-    expect(await data).toMatchInlineSnapshot('"bar"');
+    expect(await data).toMatchInlineSnapshot(`
+      [
+        "a",
+        "b",
+      ]
+    `);
   });
 });

@@ -1,14 +1,16 @@
 import { request } from '@octokit/request';
 
-import type { Metadata, RequestDetails } from './schema';
-import { idSchema, requestDetailsSchema } from './schema';
+import { assignNewMetadata, getBodyAndMetadata, parseMetadata } from './util';
+
+import type { Metadata, MetadataObject, RequestDetails } from './schema';
+import { idSchema, metadataObjectSchema, requestDetailsSchema } from './schema';
 
 export type { RequestDetails };
 
 export default class MetadataController {
   private readonly requestDefaults: RequestDetails;
   private readonly schema: Metadata;
-  private readonly regexp: RegExp;
+  readonly regexp: RegExp;
 
   constructor(uniqueID: string, settings: RequestDetails) {
     const verifiedID = idSchema.parse(uniqueID);
@@ -28,19 +30,19 @@ export default class MetadataController {
     );
   }
 
-  async getMetadata(issue: number): Promise<Record<string, string> | undefined>;
+  async getMetadata(issue: number): Promise<MetadataObject | undefined>;
   async getMetadata(
     issue: number,
     key: string
-  ): Promise<Record<string, string> | undefined>;
+  ): Promise<MetadataObject | undefined>;
   async getMetadata(
     issue: number,
     key: string
-  ): Promise<Record<string, string> | undefined>;
+  ): Promise<MetadataObject | undefined>;
   async getMetadata(
     issue: number,
     key?: string
-  ): Promise<Record<string, string> | undefined> {
+  ): Promise<MetadataObject | undefined> {
     const body =
       (
         await request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
@@ -49,39 +51,21 @@ export default class MetadataController {
         })
       ).data.body || '';
 
-    const match = body.match(this.regexp);
-
-    if (match) {
-      const data = JSON.parse(match[1]);
-      return key ? data && data[key] : data;
-    }
+    return parseMetadata(body, key, this.regexp);
   }
 
+  async setMetadata(issue: number, key: object): Promise<MetadataObject>;
   async setMetadata(
     issue: number,
     key: string,
     value: string
-  ): Promise<Record<string, string> | never>;
-  async setMetadata(
-    issue: number,
-    key: object
-  ): Promise<Record<string, string> | never>;
-  async setMetadata(
-    issue: number,
-    key: string,
-    value: string
-  ): Promise<Record<string, string> | never>;
-  async setMetadata(
-    issue: number,
-    key: string,
-    value: string
-  ): Promise<Record<string, string> | never>;
+  ): Promise<MetadataObject>;
   async setMetadata(
     issue: number,
     key: string | object,
     value?: string
-  ): Promise<Record<string, string> | never> {
-    let body =
+  ): Promise<MetadataObject> {
+    let issueBody =
       (
         await request('GET /repos/{owner}/{repo}/issues/{issue_number}', {
           ...this.requestDefaults,
@@ -89,29 +73,25 @@ export default class MetadataController {
         })
       ).data.body || '';
 
-    let data: { [key: string]: string } = {};
+    let { body, metadata } = getBodyAndMetadata(issueBody, this.regexp);
 
-    body = body.replace(this.regexp, (_, json) => {
-      data = JSON.parse(json);
-      return '';
-    });
+    console.log(body);
+    console.log(metadata);
 
-    if (!data) data = {};
+    const parsedMetadata = metadataObjectSchema.parse(metadata);
 
-    if (typeof key === 'object') {
-      Object.assign(data, key);
-    } else {
-      data[key] = value ? value : '';
-    }
+    const newMetadata = assignNewMetadata(parsedMetadata, key, value);
 
     await request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       ...this.requestDefaults,
       issue_number: issue,
       body: `${body}\n\n${this.schema.template.before}${
         this.schema.id
-      } = ${JSON.stringify(data)}${this.schema.template.after}`,
+      } = ${JSON.stringify(newMetadata)}${this.schema.template.after}`,
     });
 
-    return data;
+    console.log(newMetadata);
+
+    return newMetadata;
   }
 }
