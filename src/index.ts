@@ -75,9 +75,6 @@ export default class MetadataController {
 
     let { body, metadata } = getBodyAndMetadata(issueBody, this.regexp);
 
-    console.log(body);
-    console.log(metadata);
-
     const parsedMetadata = metadataObjectSchema.parse(metadata);
 
     const newMetadata = assignNewMetadata(parsedMetadata, key, value);
@@ -89,8 +86,6 @@ export default class MetadataController {
         this.schema.id
       } = ${JSON.stringify(newMetadata)}${this.schema.template.after}`,
     });
-
-    console.log(newMetadata);
 
     return newMetadata;
   }
