@@ -14,7 +14,7 @@
     "all": "yarn run build && yarn run format && yarn test"
   },
   "type": "module",
-  "packageManager": "yarn@4.3.1",
+  "packageManager": "yarn@4.4.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/redhat-plumbers-in-action/issue-metadata.git"
