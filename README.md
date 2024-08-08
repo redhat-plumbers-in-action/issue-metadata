@@ -52,12 +52,18 @@ await controller.setMetadata(1, 'complex', [{ bar: 'baz' }]);
 ### Get metadata stored on issue
 
 ```typescript
+// In body of issue #1:
+// <!-- my_metadata_ID = {"foo":"bar"} -->
 let metadata = await controller.getMetadata(1, 'foo');
 // metadata === "bar"
 
+// In body of issue #1:
+// <!-- my_metadata_ID = {"foo":"bar"} -->
 metadata = await controller.getMetadata(1);
 // metadata === {foo: "bar"}
 
+// In body of issue #1:
+// <!-- my_metadata_ID = {"complex":[{"bar":"baz"}]} -->
 metadata = await controller.getMetadata(1, 'complex');
 // metadata === [{ bar: 'baz' }]
 ```
