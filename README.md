@@ -67,3 +67,13 @@ metadata = await controller.getMetadata(1);
 metadata = await controller.getMetadata(1, 'complex');
 // metadata === [{ bar: 'baz' }]
 ```
+
+> [!IMPORTANT]
+>
+> In current implementation when setting metadata, it always overrides the previous metadata. For example:
+>
+> ```typescript
+> // <!-- my_metadata_ID = {"foo":"bar", "complex":[{"bar":"baz"}]} -->
+> await controller.setMetadata(1, 'complex', [{ foo: 'bar' }]);
+> // In body of issue #1:
+> // <!-- my_metadata_ID = {"foo":"bar", "complex":[{"foo":"bar"}]} -->
