@@ -46,7 +46,7 @@ await controller.setMetadata(1, { foo: 'bar' });
 
 await controller.setMetadata(1, 'complex', [{ bar: 'baz' }]);
 // In body of issue #1:
-// <!-- my_metadata_ID = {"foo":[{"bar":"baz"}]} -->
+// <!-- my_metadata_ID = {"complex":[{"bar":"baz"}]} -->
 ```
 
 ### Get metadata stored on issue
