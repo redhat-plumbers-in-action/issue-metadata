@@ -28,7 +28,7 @@ export const requestDetailsSchema = z.object(
 export type RequestDetails = z.infer<typeof requestDetailsSchema>;
 
 export const metadataObjectSchema = z.record(
-  z.union([z.string(), z.array(z.string()), z.array(z.record(z.string()))]),
+  z.union([z.string(), z.array(z.string()), z.array(z.record(z.any()))]),
   {
     required_error: `Metadata doesn't have an expected structure: {key: string, value: string | string[] | object[]}`,
   }
