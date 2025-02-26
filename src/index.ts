@@ -77,12 +77,13 @@ export default class MetadataController {
 
     const parsedMetadata = metadataObjectSchema.parse(metadata);
 
+    const trimmedBody = body.trim();
     const newMetadata = assignNewMetadata(parsedMetadata, key, value);
 
     await request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       ...this.requestDefaults,
       issue_number: issue,
-      body: `${body}\n\n${this.schema.template.before}${
+      body: `${trimmedBody}\n\n${this.schema.template.before}${
         this.schema.id
       } = ${JSON.stringify(newMetadata)}${this.schema.template.after}`,
     });
