@@ -76,9 +76,13 @@ export default class MetadataController {
     let { body, metadata } = getBodyAndMetadata(issueBody, this.regexp);
 
     const parsedMetadata = metadataObjectSchema.parse(metadata);
+    const newMetadata = assignNewMetadata(parsedMetadata, key, value);
+
+    if (JSON.stringify(parsedMetadata) === JSON.stringify(newMetadata)) {
+      return newMetadata;
+    }
 
     const trimmedBody = body.trim();
-    const newMetadata = assignNewMetadata(parsedMetadata, key, value);
 
     await request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       ...this.requestDefaults,
