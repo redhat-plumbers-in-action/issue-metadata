@@ -2,11 +2,12 @@
   "name": "issue-metadata",
   "version": "0.2.4",
   "description": "A NodeJS module to store metadata on GitHub Issues and Pull Requests.",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "build": "esbuild ./src/index.js --bundle --outdir=dist --platform=node --target=node20.0.0 --packages=bundle",
+    "build": "esbuild ./src/index.ts --bundle --outdir=dist --platform=node --target=node24.0.0 --packages=bundle --format=esm && tsc --emitDeclarationOnly",
     "format": "prettier --write '**/*.ts'",
     "format-check": "prettier --check '**/*.ts'",
     "test": "vitest run --coverage",
