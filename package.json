@@ -1,6 +1,6 @@
 {
   "name": "issue-metadata",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "A NodeJS module to store metadata on GitHub Issues and Pull Requests.",
   "type": "module",
   "main": "dist/index.js",
