@@ -78,18 +78,22 @@ export default class MetadataController {
     const parsedMetadata = metadataObjectSchema.parse(metadata);
     const newMetadata = assignNewMetadata(parsedMetadata, key, value);
 
-    if (JSON.stringify(parsedMetadata) === JSON.stringify(newMetadata)) {
+    const metadataComment = `${this.schema.template.before}${
+      this.schema.id
+    } = ${JSON.stringify(newMetadata)}${this.schema.template.after}`;
+
+    const newBody = this.regexp.test(issueBody)
+      ? issueBody.replace(this.regexp, metadataComment)
+      : `${body.trim()}\n\n${metadataComment}`;
+
+    if (newBody === issueBody) {
       return newMetadata;
     }
-
-    const trimmedBody = body.trim();
 
     await request('PATCH /repos/{owner}/{repo}/issues/{issue_number}', {
       ...this.requestDefaults,
       issue_number: issue,
-      body: `${trimmedBody}\n\n${this.schema.template.before}${
-        this.schema.id
-      } = ${JSON.stringify(newMetadata)}${this.schema.template.after}`,
+      body: newBody,
     });
 
     return newMetadata;

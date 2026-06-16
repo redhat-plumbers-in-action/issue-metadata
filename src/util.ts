@@ -30,8 +30,7 @@ export function assignNewMetadata(
   value?: string | undefined
 ) {
   if (typeof key === 'object') {
-    Object.assign(metadata, key);
-    return metadata;
+    return { ...metadata, ...key };
   }
 
   return { ...metadata, [key]: value ? value : '' };

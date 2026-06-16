@@ -80,3 +80,93 @@ describe('Integration tests ', () => {
     `);
   });
 });
+
+describe('Skip write optimization', () => {
+  beforeEach(async () => {
+    mocks.request.mockReset();
+  });
+
+  test('skips PATCH when resulting body is identical', async () => {
+    const body = `Issue body\n\n<!-- metadata_id = {"foo":"bar"} -->`;
+
+    vi.mocked(mocks.request).mockResolvedValueOnce({
+      status: 200,
+      data: { body },
+    });
+
+    const result = await metadata.setMetadata(issueNumber, 'foo', 'bar');
+    expect(result).toEqual({ foo: 'bar' });
+    expect(mocks.request).toHaveBeenCalledTimes(1);
+    expect(mocks.request).toHaveBeenCalledWith(
+      'GET /repos/{owner}/{repo}/issues/{issue_number}',
+      expect.anything()
+    );
+  });
+
+  test('writes when metadata changed', async () => {
+    const body = `Issue body\n\n<!-- metadata_id = {"foo":"bar"} -->`;
+
+    vi.mocked(mocks.request)
+      .mockResolvedValueOnce({ status: 200, data: { body } })
+      .mockResolvedValueOnce({ status: 200, data: { body } });
+
+    const result = await metadata.setMetadata(issueNumber, 'foo', 'updated');
+    expect(result).toEqual({ foo: 'updated' });
+    expect(mocks.request).toHaveBeenCalledTimes(2);
+    expect(mocks.request).toHaveBeenLastCalledWith(
+      'PATCH /repos/{owner}/{repo}/issues/{issue_number}',
+      expect.objectContaining({
+        body: `Issue body\n\n<!-- metadata_id = {"foo":"updated"} -->`,
+      })
+    );
+  });
+
+  test('preserves body formatting when metadata exists and is unchanged', async () => {
+    const body = `Issue body  \n\n\n\n<!-- metadata_id = {"foo":"bar"} -->`;
+
+    vi.mocked(mocks.request).mockResolvedValueOnce({
+      status: 200,
+      data: { body },
+    });
+
+    const result = await metadata.setMetadata(issueNumber, 'foo', 'bar');
+    expect(result).toEqual({ foo: 'bar' });
+    expect(mocks.request).toHaveBeenCalledTimes(1);
+  });
+
+  test('replaces metadata in-place when content exists after it', async () => {
+    const body = `Issue body\n\n<!-- metadata_id = {"foo":"bar"} -->\n\n## Summary by CodeRabbit\nSome content`;
+
+    vi.mocked(mocks.request)
+      .mockResolvedValueOnce({ status: 200, data: { body } })
+      .mockResolvedValueOnce({ status: 200, data: {} });
+
+    const result = await metadata.setMetadata(issueNumber, 'foo', 'updated');
+    expect(result).toEqual({ foo: 'updated' });
+    expect(mocks.request).toHaveBeenCalledTimes(2);
+    expect(mocks.request).toHaveBeenLastCalledWith(
+      'PATCH /repos/{owner}/{repo}/issues/{issue_number}',
+      expect.objectContaining({
+        body: `Issue body\n\n<!-- metadata_id = {"foo":"updated"} -->\n\n## Summary by CodeRabbit\nSome content`,
+      })
+    );
+  });
+
+  test('appends metadata with trimmed body when no metadata exists', async () => {
+    const body = `Issue body  \n\n\n`;
+
+    vi.mocked(mocks.request)
+      .mockResolvedValueOnce({ status: 200, data: { body } })
+      .mockResolvedValueOnce({ status: 200, data: {} });
+
+    const result = await metadata.setMetadata(issueNumber, 'foo', 'bar');
+    expect(result).toEqual({ foo: 'bar' });
+    expect(mocks.request).toHaveBeenCalledTimes(2);
+    expect(mocks.request).toHaveBeenLastCalledWith(
+      'PATCH /repos/{owner}/{repo}/issues/{issue_number}',
+      expect.objectContaining({
+        body: `Issue body\n\n<!-- metadata_id = {"foo":"bar"} -->`,
+      })
+    );
+  });
+});
